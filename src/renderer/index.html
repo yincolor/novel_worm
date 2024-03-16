@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>盗书蠕虫</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/app.css">
+    <script src="./js/bootstrap.bundle.min.js"></script>
+    <script src="./js/jsstore.min.js"></script>
+    <script src="./js/jsstore.worker.min.js"></script>
+    <!-- <script src="./js/Base64.js"></script> -->
+</head>
+
+<body>
+    <div class="container-fluid vh-100 d-flex p-0">
+        <div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark" style="width: 128px;">
+            <div class="d-flex align-items-center justify-content-center text-white text-decoration-none">
+                <p class="h5">盗书蠕虫</p>
+            </div>
+            <hr>
+            <ul id="main-nav" class="nav nav-pills flex-column mb-auto">
+                <a id="main-page" href="#" class="nav-item nav-link text-white active">我的书架</a>
+                <a id="search-list" href="#" class="nav-item nav-link text-white">小说搜索</a>
+                <a id="book-source-manage" href="#" class="nav-item nav-link text-white">书源管理</a>
+                <a id="cache-manage" href="#" class="nav-item nav-link text-white">缓存管理</a>
+                <div id="iframe-container" style="height: 0px; width: 0px;"></div>
+            </ul>
+            <hr>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <strong>设置</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                    <a id="app-help" class="dropdown-item" href="#">使用帮助</a>
+                    <a id="app-about" class="dropdown-item" href="#">关于本软件</a>
+                    <hr class="dropdown-divider">
+                    <a id="app-dev-tools" class="dropdown-item" href="#">开启调试窗口</a>
+                    <a id="app-reload" class="dropdown-item" href="#">刷新窗口</a>
+                    <a id="app-quit" class="dropdown-item" href="#">退出软件</a>
+                </ul>
+            </div>
+        </div>
+        <div class="flex-grow-1 d-flex flex-column">
+
+            <div class="d-flex align-items-center">
+                <div class="wrapper-nav flex-grow-1">
+                    <ul id="page-tabs" class="nav nav-tabs list" role="tablist">
+                    </ul>
+                </div>
+                <div class="scroller scroller-left"><a id="tabbar-scroller-left-btn" href="#">◄</a></div>
+                <div class="scroller scroller-right"><a id="tabbar-scroller-right-btn" href="#">►</a></div>
+            </div>
+
+            <div id="page-view" class="tab-content flex-grow-1 overflow-y-scroll">
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./js/app.js"></script>
+</body>
+
+</html>
