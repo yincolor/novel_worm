@@ -192,8 +192,7 @@ export class SearchList extends PaneContent {
                     }
                 }
             } catch (error) {
-                console.log(error);
-                alert('搜索执行报错：site_url = ' + site_url);
+                console.error(error);
                 break;
             }
             await this.updateSearchList();
@@ -987,7 +986,7 @@ export class AppAbout extends PaneContent {
         this.component = new VBox({
             children: [
                 new Text({ text: "* 小说蠕虫" }),
-                new Text({ text: "* 版本: 0.2.0" }),
+                new Text({ text: "* 版本: 0.3.0" }),
                 new Text({ text: "* 简介: 这是一个管理小说、阅读小说的爬虫客户端，需要配置书源才能使用。" }),
                 new Text({ text: "* 作者: ty" }),
                 new Text({ text: '* 客户端组件版本: ' }),

@@ -1,3 +1,4 @@
+import { Base64 } from './Base64.js'
 /**
  * 书源管理器 全静态，可以在页面任意地点调用
  */
@@ -47,7 +48,58 @@ export class BookSourceManager {
         },
         closeIframe: function (iframe) { if (iframe) { document.getElementById('iframe-container').removeChild(iframe); } },
         parserToHtml: function (html_content) { return (new DOMParser()).parseFromString(html_content, 'text/html'); },
-        asleep: async function (ms) { return new Promise((resolve) => { setTimeout(resolve, ms); }); }
+        asleep: async function (ms) { return new Promise((resolve) => { setTimeout(resolve, ms); }); },
+        /**
+         * 打开一个POST请求的网页，返回创建的iframe节点
+         * @param {String} post_url 请求URL 
+         * @param {{key1:val1}} data post请求传送的数据，目前只支持 {key1:val1, key2:val2}这样的一维键值对，val为字符串格式
+         * @param {Number} timeout 等待超时时间
+         */
+        openPostIframe: async function (post_url, data, timeout){
+            const div = document.createElement('div');
+            const form = document.createElement('form');
+            for(const key of Object.keys(data)){
+                const input = document.createElement('input');
+                input.name = key; 
+                input.value = data[key]; 
+                input.type = 'text'; 
+                form.append(input); 
+            }
+            const iframe_name = 'iframe_' + Base64.encodeNoEqualsSign(post_url);
+            form.target = iframe_name;
+            form.method = 'post';
+            form.action = post_url; 
+            const iframe = document.createElement('iframe'); 
+            iframe.name = iframe_name;
+            iframe.height = 0; iframe.width = 0;
+            div.append(form, iframe); 
+            div.style.height = 0;
+            div.style.width = 0; 
+            return new Promise((resolve, _) => {
+                iframe.onload = async () => {
+                    console.log("iframe加载完毕", src);
+                    resolve(i);
+                }
+                iframe.onerror = () => {
+                    console.log('iframe加载失败', src);
+                    resolve(null);
+                }
+                document.getElementById('iframe-container').append(div);
+                form.submit(); 
+                setTimeout(() => {
+                    console.log("iframe加载网页超时了，无论如何都返回iframe对象");
+                    resolve(iframe);
+                }, timeout);
+            });
+        },
+        /**
+         * 关闭请求POST网页的iframe节点
+         * @param {Element} iframe 
+         */
+        closePostIframe(iframe){
+            const div = iframe.parentNode;
+            document.getElementById('iframe-container').removeChild(div); 
+        }
     };
 
     /** 初始化书源管理器 */
