@@ -1,6 +1,6 @@
 {
   "name": "novel_worm",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "",
   "main": "src/main/main.js",
   "scripts": {

@@ -1008,10 +1008,12 @@ export class AppAbout extends PaneContent {
     start() {
         this.component = new VBox({
             children: [
-                new Text({ text: "* 小说蠕虫" }),
-                new Text({ text: "* 版本: 0.3.1" }),
-                new Text({ text: "* 简介: 这是一个管理小说、阅读小说的爬虫客户端，需要配置书源才能使用。" }),
+                new Text({ text: "* 应用名称：盗书蠕虫" }),
+                new Text({ text: "* 应用版本: 0.3.3" }),
+                new Text({ text: "* 应用介绍: 这是一个管理、阅读网络小说的爬虫工具，需要配置书源才能使用。" }),
                 new Text({ text: "* 作者: ty" }),
+                new Text({ text: "* 项目地址: https://github.com/yincolor/novel_worm" }),
+                new Text({ text: "* 开源协议: GNU Affero General Public License v3.0" }),
                 new Text({ text: '* 客户端组件版本: ' }),
                 new Text({ text: `* -- Electron: ${local.electronVersion()}` }),
                 new Text({ text: `* -- Chromium: ${local.chromeVersion()}` }),
