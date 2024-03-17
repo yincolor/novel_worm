@@ -20,7 +20,11 @@ function emitAddPageEvent(id, name, content_class, param) {
     });
     document.dispatchEvent(_event);
 }
-
+/** 发送页面滚动到顶部的事件 */
+function emitViewScrollTopEvent() {
+    const closeTabbedEvent = new CustomEvent('view-scroll-top');
+    document.dispatchEvent(closeTabbedEvent);
+}
 export class PaneContent {
     constructor(id, param) {
         this.id = id;
@@ -782,6 +786,7 @@ export class ChapterContent extends PaneContent {
                             /** 下一章可以被获取到 */
                             await BookshelfManager.setBookReadingChapterIndex(this.book_info_url, next_reading_chapter_index);
                             await this.updateChapterContent();
+                            emitViewScrollTopEvent();
                         }
                     }
                 } catch (error) {
@@ -809,6 +814,7 @@ export class ChapterContent extends PaneContent {
                         /** 上一章可以被获取到 */
                         await BookshelfManager.setBookReadingChapterIndex(this.book_info_url, next_reading_chapter_index);
                         await this.updateChapterContent();
+                        emitViewScrollTopEvent(); 
                     }
                 } catch (error) {
                     console.log("请求上一章数据失败");
@@ -1003,7 +1009,7 @@ export class AppAbout extends PaneContent {
         this.component = new VBox({
             children: [
                 new Text({ text: "* 小说蠕虫" }),
-                new Text({ text: "* 版本: 0.3.0" }),
+                new Text({ text: "* 版本: 0.3.1" }),
                 new Text({ text: "* 简介: 这是一个管理小说、阅读小说的爬虫客户端，需要配置书源才能使用。" }),
                 new Text({ text: "* 作者: ty" }),
                 new Text({ text: '* 客户端组件版本: ' }),
@@ -1030,9 +1036,11 @@ export class AppHelp extends PaneContent {
                 new Text({ text: `* 在源码目录下，有书源的例子可以参考：src/renderer/test/书源*.js` }),
                 new Text({ text: `* 书源在执行时会获得一个变量“args”，存放着一些预制的方法：` }),
                 new Text({ text: `* -- async openIframe(src_url, timeout = 7000) 返回一个打开src_url网站的iframe对象，当加载时间超过timeout毫秒后，不管是否已经加载成功，都会返回这个iframe对象` }),
-                new Text({ text: `* -- async closeIframe(iframeObj) 将传入的iframe对象关闭` }),
+                new Text({ text: `* -- closeIframe(iframeObj) 将传入的iframe对象关闭，清理openIframe创建的iframe元素` }),
                 new Text({ text: `* -- parserToHtml(html_content) 将传入的html_content字符串转换为HTML document对象` }),
                 new Text({ text: `* -- asleep(timeout) 可以在异步async函数中执行，强制延时等待timeout毫秒的时间再向下执行` }),
+                new Text({ text: `* -- async openPostIframe(post_url, data, timeout) openIframe的post请求版本，data是post的请求数据，目前只支持一维的键值对结构` }),
+                new Text({ text: `* -- closePostIframe(iframe) closeIframe方法的POST请求版本，和openPostIframe配合的` }),
             ]
         });
         this.dom = this.component.html();

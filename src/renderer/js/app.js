@@ -81,7 +81,11 @@ function Main() {
         const { id } = ev.detail;
         tabbedManager.removeItemById(id);
     });
-
+    /** 监听页面滚动到顶部的事件，操作page-view滚动到顶部 */
+    document.addEventListener('view-scroll-top', ( )=>{
+        console.log("操作滚动到顶部");
+        document.getElementById('page-view').scrollTop = 0 ; 
+    })
     console.log('Main', '创建初始页面 - main_page');
     createPage('main-page', '我的书架', MainPage);
     mainNavActiveItem('main-page');
