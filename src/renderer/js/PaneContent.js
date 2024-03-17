@@ -100,7 +100,7 @@ export class MainPage extends PaneContent {
         });
     }
 
-    /** 创建开始阅读按钮 */
+    /** 创建首页书架，书籍的开始阅读按钮 */
     createStartReadButton(site_url, book_name, book_info_url) {
         return new Button({
             text: '阅读',
@@ -342,15 +342,30 @@ export class BookInfo extends PaneContent {
             }
         });
     }
-    /** 创建“开始阅读”按钮 */
+    /** 创建BookInfo界面的“开始阅读”按钮 */
     createStartReadButton() {
         return new Button({
             text: '开始阅读',
             class_list: ['text-nowrap', 'btn-danger', 'btn-sm'],
-            onclick: () => {
-                console.log('BookInfo', `开始阅读：《${this.book_name.text}》`)
+            onclick: async () => {
+                console.log('BookInfo', `开始阅读：《${this.book_name.text}》`);
                 if (this.info_data) {
-                    console.log(this.info_data);
+                    const _chapter_name = this.chapter_list[0].chapter_name;
+                    const _chapter_url = this.chapter_list[0].chapter_url; 
+                    const is_save = (this.chapter_list[0]?.is_save == 1)?1:0; 
+                    console.log('BookInfo', `打开章节：${_chapter_name} ${_chapter_url} ${is_save == 0 ? '尚未缓存' : '已缓存'}`);
+                        let chapter_item = await BookshelfManager.getChapterItemByChapterUrl(_chapter_url);
+                        console.log("BookInfo", '从书架数据库中获得章节对象：', chapter_item);
+                        if (!chapter_item) {
+                            console.log('BookInfo', '没有从书架数据库中查到该章节，可能是尚未放入书架;');
+                            const is_save_to_bookshelf = confirm('阅读章节内容，需要先将本书放入书架，是否放入书架？');
+                            if (is_save_to_bookshelf) {
+                                await this.saveBookInfoToDatabase();
+                                chapter_item = await BookshelfManager.getChapterItemByChapterUrl(_chapter_url);
+                            }else {
+                                return; 
+                            }
+                        }
                     const encode_str = Base64.encodeNoEqualsSign(this.book_info_url);
                     emitAddPageEvent('content-reader-' + encode_str, '阅读-' + this.info_data.name, ChapterContent, {
                         site_url: this.site_url, book_name: this.info_data.name, book_info_url: this.book_info_url, from_page: 'bookinfo'
@@ -427,10 +442,11 @@ export class BookInfo extends PaneContent {
         } else {
             console.log('BookInfo', "更新章节列表界面失败，this.chapter_list 有问题：");
             console.log(this.chapter_list);
+            alert('[BookInfo] 获取章节列表失败.');
         }
     }
 
-    /** 创建单个章节的按钮 */
+    /** 创建BookInfo界面的单个章节的按钮 */
     async createChapterButtonRow(_chapter_name, _chapter_url, is_save = 0) {
         return new TableRow({
             children: [
@@ -447,6 +463,8 @@ export class BookInfo extends PaneContent {
                             if (is_save_to_bookshelf) {
                                 await this.saveBookInfoToDatabase();
                                 chapter_item = await BookshelfManager.getChapterItemByChapterUrl(_chapter_url);
+                            }else {
+                                return; 
                             }
                         }
                         const c_index = chapter_item.c_index;
@@ -509,7 +527,6 @@ export class BookInfo extends PaneContent {
         }
         return chapter_list;
     }
-
     /** 获取本书的书源，如果没有找到，返回null */
     async getBookSource() {
         let source = null;
@@ -905,7 +922,7 @@ export class CacheManager extends PaneContent {
                         await this.updateCacheInfo();
                     }
                 }
-            }, 2000);
+            }, 5000);
         });
     }
 

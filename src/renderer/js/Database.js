@@ -26,24 +26,28 @@ export class BookSourceManager {
 
     /** 传递给书源的参数 */
     static book_source_args = {
+
         openIframe: async function (src, timeout = 7000) {
             const i = document.createElement('iframe');
-            i.height = 0; i.width = 0;
+            i.height = 400; i.width = 400;
             i.src = src;
             return new Promise((resolve, _) => {
+                const _timeout_id = setTimeout(() => {
+                    console.log("iframe加载网页超时了，无论如何都返回iframe对象"); 
+                    resolve(i);
+                }, timeout);
                 i.onload = async () => {
                     console.log("iframe加载完毕", src);
+                    clearTimeout(_timeout_id); 
                     resolve(i);
                 }
                 i.onerror = () => {
                     console.log('iframe加载失败', src);
+                    clearTimeout(_timeout_id); 
                     resolve(null);
                 }
                 document.getElementById('iframe-container').append(i);
-                setTimeout(() => {
-                    console.log("iframe加载网页超时了，无论如何都返回iframe对象");
-                    resolve(i);
-                }, timeout);
+                
             });
         },
         closeIframe: function (iframe) { if (iframe) { document.getElementById('iframe-container').removeChild(iframe); } },
@@ -336,7 +340,11 @@ export class BookshelfManager {
         }
         const res = await this.connection.select({
             from: this.tbl_chapter_list.name,
-            where: { book_info_url: _book_info_url }
+            where: { book_info_url: _book_info_url },
+            order:{
+                by: 'c_index',
+                type: 'asc'
+            }
         });
         return res;
     }
@@ -402,6 +410,10 @@ export class BookshelfManager {
         const res = await this.connection.select({
             from: this.tbl_chapter_list.name,
             where: { book_info_url: book_info_url, is_save: 0 },
+            order:{
+                by: 'c_index',
+                type: 'asc'
+            },
             limit: 1
         });
         if (res && res.length > 0) {

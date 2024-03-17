@@ -138,8 +138,6 @@ async function _chapter_content(chapter_url) {
     // console.log("书源1", '打开一个iframe, url = '+ chapter_url);
     iframe = await openIframe(chapter_url, 3000);
     const doc = iframe.contentDocument;
-    // console.log(doc);
-    // const doc = parserToHtml(html_content);
     const chapter_content = doc?.getElementById('content')?.innerText;
     // console.log('获取内容：', chapter_content);
     closeIframe(iframe);
