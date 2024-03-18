@@ -43,3 +43,18 @@ textarea{
 #page-view * {
     background-image: none;
 }
+
+#iframe-container{
+    height: 300px;
+    width: 300px;
+    background-color: #ff22ff;
+    overflow: scroll;
+    top: 0;
+    left: 0;
+    position: fixed;
+    z-index: -10000;
+}
+
+#main-window-view{
+    background-color: #fff;
+}

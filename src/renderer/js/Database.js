@@ -372,6 +372,18 @@ export class BookshelfManager {
             return null;
         }
     }
+    /** 获取已经缓存内容的章节列表 is_save == 1 */
+    static async getSavedChapterListByInfoUrl(_book_info_url){
+        const res = await this.connection.select({
+            from: this.tbl_chapter_list.name,
+            where: { book_info_url: _book_info_url, is_save: 1 },
+            order:{
+                by: 'c_index',
+                type: 'asc'
+            }
+        });
+        return res;
+    }
     /**
      * 获取所有书籍的章节数量（已缓存的和未缓存的）
      * @returns {Promise<{ book_info_url: {save, no_save} }>}

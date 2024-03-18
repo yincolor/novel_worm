@@ -355,21 +355,21 @@ export class BookInfo extends PaneContent {
                 console.log('BookInfo', `开始阅读：《${this.book_name.text}》`);
                 if (this.info_data) {
                     const _chapter_name = this.chapter_list[0].chapter_name;
-                    const _chapter_url = this.chapter_list[0].chapter_url; 
-                    const is_save = (this.chapter_list[0]?.is_save == 1)?1:0; 
+                    const _chapter_url = this.chapter_list[0].chapter_url;
+                    const is_save = (this.chapter_list[0]?.is_save == 1) ? 1 : 0;
                     console.log('BookInfo', `打开章节：${_chapter_name} ${_chapter_url} ${is_save == 0 ? '尚未缓存' : '已缓存'}`);
-                        let chapter_item = await BookshelfManager.getChapterItemByChapterUrl(_chapter_url);
-                        console.log("BookInfo", '从书架数据库中获得章节对象：', chapter_item);
-                        if (!chapter_item) {
-                            console.log('BookInfo', '没有从书架数据库中查到该章节，可能是尚未放入书架;');
-                            const is_save_to_bookshelf = confirm('阅读章节内容，需要先将本书放入书架，是否放入书架？');
-                            if (is_save_to_bookshelf) {
-                                await this.saveBookInfoToDatabase();
-                                chapter_item = await BookshelfManager.getChapterItemByChapterUrl(_chapter_url);
-                            }else {
-                                return; 
-                            }
+                    let chapter_item = await BookshelfManager.getChapterItemByChapterUrl(_chapter_url);
+                    console.log("BookInfo", '从书架数据库中获得章节对象：', chapter_item);
+                    if (!chapter_item) {
+                        console.log('BookInfo', '没有从书架数据库中查到该章节，可能是尚未放入书架;');
+                        const is_save_to_bookshelf = confirm('阅读章节内容，需要先将本书放入书架，是否放入书架？');
+                        if (is_save_to_bookshelf) {
+                            await this.saveBookInfoToDatabase();
+                            chapter_item = await BookshelfManager.getChapterItemByChapterUrl(_chapter_url);
+                        } else {
+                            return;
                         }
+                    }
                     const encode_str = Base64.encodeNoEqualsSign(this.book_info_url);
                     emitAddPageEvent('content-reader-' + encode_str, '阅读-' + this.info_data.name, ChapterContent, {
                         site_url: this.site_url, book_name: this.info_data.name, book_info_url: this.book_info_url, from_page: 'bookinfo'
@@ -467,8 +467,8 @@ export class BookInfo extends PaneContent {
                             if (is_save_to_bookshelf) {
                                 await this.saveBookInfoToDatabase();
                                 chapter_item = await BookshelfManager.getChapterItemByChapterUrl(_chapter_url);
-                            }else {
-                                return; 
+                            } else {
+                                return;
                             }
                         }
                         const c_index = chapter_item.c_index;
@@ -814,7 +814,7 @@ export class ChapterContent extends PaneContent {
                         /** 上一章可以被获取到 */
                         await BookshelfManager.setBookReadingChapterIndex(this.book_info_url, next_reading_chapter_index);
                         await this.updateChapterContent();
-                        emitViewScrollTopEvent(); 
+                        emitViewScrollTopEvent();
                     }
                 } catch (error) {
                     console.log("请求上一章数据失败");
@@ -908,7 +908,7 @@ export class CacheManager extends PaneContent {
                             /** 找到了书籍 且该书处于可以缓存的状态，并且这个书还没有正在缓存的章节，找一个尚未缓存的章节进行缓存 */
                             const chapter = await BookshelfManager.getOneNoSaveChapter(url_key);
                             if (chapter) {
-                                console.log('CacheManager', '开始下载：', chapter?.chapter_url, chapter?.chapter_name, chapter?.book_info_url);
+                                console.log('CacheManager', '开始下载：', chapter?.chapter_url, chapter?.chapter_name);
                                 try {
                                     book.downloading_chapter_url = chapter.chapter_url;
                                     const source = await BookSourceManager.getBookSourceObj(chapter.site_url);
@@ -962,42 +962,71 @@ export class CacheManager extends PaneContent {
             /** 获取该书的章节总数 */
             const chapter_list_len = save + no_save; // chapter_list.length;
             /** 站点信息 */
-            const site = site_url || '书籍的书源丢失了';
+            const site_str = site_url || '书籍的书源丢失了';
             /** 创建该书籍的缓存数据 */
-            const row = this.createCacheTableRow(site_url, book_info_url, name, save_chapter_num, chapter_list_len, site, is_downloading);
+            const row = this.createCacheTableRow(site_url, book_info_url, name, save_chapter_num, chapter_list_len, site_str, is_downloading);
             this.cache_table.children.push(row);
         }
         this.cache_table.update();
     }
-
-    createCacheTableRow(site_url, book_info_url, book_name, save_chapter_num, chapter_list_len, source, is_downloading) {
+    /** 创建缓存书籍列表 */
+    createCacheTableRow(site_url, book_info_url, book_name, save_chapter_num, chapter_list_len, source_name, is_downloading) {
         return new TableRow({
             children: [
                 `《${book_name}》`,
                 `${save_chapter_num}/${chapter_list_len}`,
-                source,
+                source_name,
                 new HBox({
                     children: [
                         this.createStartStopDownloadButton(site_url, book_info_url, is_downloading),
+                        this.createSaveToLocalButton(site_url, book_info_url, book_name, save_chapter_num, chapter_list_len), 
                     ]
                 }),
             ]
         });
     }
-
     /** 创建开始和暂停下载的按钮 */
     createStartStopDownloadButton(site_url, book_info_url, is_downloading) {
         return new Button({
             text: is_downloading ? '暂停缓存' : '开始缓存',
             class_list: ['text-nowrap', 'btn-primary', 'btn-sm'],
-            onclick: () => {
-                // console.log('CacheManager', `开始缓存 或 暂停缓存 ${book_info_url}`);
-                // console.log('CacheManager', '获得书籍的缓存状态：', this.download_data[book_info_url]);
+            onclick: (ev) => {
                 const old_downloading_state = this.download_data[book_info_url].is_downloading
                 this.download_data[book_info_url].is_downloading = old_downloading_state ? false : true;
-                this.updateCacheInfo();
+                // this.updateCacheInfo();
+                ev.target.textContent = this.download_data[book_info_url].is_downloading ? '暂停缓存' : '开始缓存';
             }
         });
+    }
+    /** 创建保存网址 */
+    createSaveToLocalButton(site_url, book_info_url, book_name, save_chapter_num, chapter_list_len) {
+        return new Button({
+            text: '导出本地',
+            class_list: ['text-nowrap', 'btn-primary', 'btn-sm'],
+            onclick: async (ev) => {
+                if (save_chapter_num < chapter_list_len) {
+                    const is_ignore_completed = confirm(`《${book_name}》还有${chapter_list_len - save_chapter_num}个章节尚未缓存，继续导出将忽略没有缓存的章节，是否继续？`);
+                    if (is_ignore_completed == false) {
+                        return;
+                    }
+                }
+                const chapter_list = await BookshelfManager.getSavedChapterListByInfoUrl(book_info_url);
+                const content_list = [];
+                for (let i = 0; i < chapter_list.length; i++) {
+                    const chapter = chapter_list[i];
+                    const { chapter_name, content } = chapter;
+                    content_list.push(`${chapter_name}\n${content}`); 
+                }
+                const save_content = content_list.join('\n\n'); 
+                const {is_ok, file_path} = await local.saveBook(book_name, save_content); 
+                if(is_ok){
+                    alert(`《${book_name}》保存书籍成功，文件路径：${file_path}`);
+                }else {
+                    alert(`《${book_name}》保存失败`);
+                }
+            }
+        });
+
     }
 }
 /** 应用关于界面 */
