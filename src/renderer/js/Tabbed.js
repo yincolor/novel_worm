@@ -21,7 +21,13 @@ export class TabbedItem {
         p1.innerHTML = `
         <li class="nav-item" href="#" data-bs-toggle="tab" data-bs-target="#${this.pane_id}" role="tab" aria-controls="#${this.pane_id}" aria-selected="false">
             <button class="small nav-link" id='${this.tab_id}' data-bs-toggle="tab" data-bs-target="#${this.pane_id}" type="button" role="tab" aria-controls="${this.pane_id}" aria-selected="true">
-                ${this.name} <a href='#' class='tab-close-btn'>(x)</a>
+                ${this.name} 
+                <a href='#' class='tab-close-btn'>
+                    <svg  height="14" width="14">
+                    <line x1="2" y1="2" x2="12" y2="12" style="stroke:#232323;stroke-width:2"/>
+                    <line x1="12" y1="2" x2="2" y2="12" style="stroke:#232323;stroke-width:2"/>
+                    </svg>
+                </a>
             </button>
         </li>`;
         this.tab_el = p1.children[0];

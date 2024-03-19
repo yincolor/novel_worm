@@ -1,6 +1,6 @@
 import { Base64 } from "./Base64.js";
 import { BookSourceManager, BookshelfManager } from "./Database.js";
-import { Button, HBox, Input, Switches, Table, TableRow, Text, TextArea, VBox } from "./Component.js";
+import { Button, HBox, Input, Switches, Table, TableRow, Text, VBox } from "./Component.js";
 
 /** 发送关闭页面事件 */
 function emitClosePageEvent(id) {

@@ -4,18 +4,14 @@ export class Base64 {
      * @param {String} str  
      * @returns 
      */
-    static encode(str) {
-        return btoa(encodeURI(str))
-    }
+    static encode(str) { return btoa(encodeURI(str)); }
 
     /**
      * 解码
      * @param {String} str 
      * @returns 
      */
-    static decode(str) {
-        return decodeURI(atob(str));
-    }
+    static decode(str) { return decodeURI(atob(str)); }
 
     /**
      * 编码 但是去掉结尾的等号

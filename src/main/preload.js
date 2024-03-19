@@ -1,5 +1,4 @@
 const { contextBridge, ipcRenderer } = require('electron');
-
 contextBridge.exposeInMainWorld('local', {
     nodeVersion: () => process.versions.node,
     chromeVersion: () => process.versions.chrome,
@@ -16,7 +15,6 @@ contextBridge.exposeInMainWorld('local', {
         const { is_ok, file_path } = await ipcRenderer.invoke('save-book', book_name, content);
         return { is_ok, file_path };
     },
-    getAppData: () => {
-        return { name: '窃墨蠕虫', version: '0.4.1' };
-    }
+    /** 获取应用的配置数据 */
+    getAppData: () => { return { name: '窃墨蠕虫', version: '0.4.2' }; }
 });
