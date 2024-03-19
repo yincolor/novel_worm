@@ -75,11 +75,18 @@ export class MainPage extends PaneContent {
     /** 更新书架内容 */
     async updateBookshelf() {
         this.book_list = await BookshelfManager.getAllBook();
-
+        const source_cache = {}; 
         this.book_table.children = [];
         for (const book of this.book_list) {
             const { book_info_url, site_url, name, author, latest_chapter, intro, reading_chapter_index, chapter_num } = book;
-            const _book_source = await BookSourceManager.getBookSourceObj(site_url);
+            let _book_source = null; 
+            if(source_cache[site_url]){
+                _book_source = source_cache[site_url];
+            }else {
+                console.log('MainPage', '加载书源数据：', site_url); 
+                _book_source = await BookSourceManager.getBookSourceObj(site_url);
+                source_cache[site_url] = _book_source; 
+            }
             const site_name = _book_source?.name || '丢失的书源';
             const row = this.createBookTableRow(site_url, book_info_url, name, author, reading_chapter_index, chapter_num, `${site_name}（${site_url}）`);
             this.book_table.children.push(row);
@@ -539,12 +546,10 @@ export class BookInfo extends PaneContent {
         } else {
             const _book_source = await BookSourceManager.getBookSourceObj(this.site_url);
             if (_book_source) {
-                // const script_content = source_list[0].script;
-                // const func = new Function(script_content);
                 source = _book_source
                 this.book_source = source; /* 将书源缓存入页面 */
             } else {
-                alert('异常：无法找到该书籍对应的书源, info_url = ' + this.book_info_url);
+                alert('BookInfo 异常：无法找到该书籍对应的书源, info_url = ' + this.book_info_url);
                 source = null;
             }
         }
@@ -1035,10 +1040,11 @@ export class AppAbout extends PaneContent {
         super(id);
     }
     start() {
+        const {name, version} = local.getAppData(); 
         this.component = new VBox({
             children: [
-                new Text({ text: "* 应用名称：盗书蠕虫" }),
-                new Text({ text: "* 应用版本: 0.3.3" }),
+                new Text({ text: "* 应用名称：" + name }),
+                new Text({ text: "* 应用版本: " + version }),
                 new Text({ text: "* 应用介绍: 这是一个管理、阅读网络小说的爬虫工具，需要配置书源才能使用。" }),
                 new Text({ text: "* 作者: ty" }),
                 new Text({ text: "* 项目地址: https://github.com/yincolor/novel_worm" }),

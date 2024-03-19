@@ -1,6 +1,6 @@
 export class Base64 {
     /**
-     * 加密
+     * 编码
      * @param {String} str  
      * @returns 
      */
@@ -9,7 +9,7 @@ export class Base64 {
     }
 
     /**
-     * 解密
+     * 解码
      * @param {String} str 
      * @returns 
      */
@@ -18,7 +18,7 @@ export class Base64 {
     }
 
     /**
-     * 加密 但是去掉结尾的等号
+     * 编码 但是去掉结尾的等号
      * @param {String} str 
      * @returns 
      */

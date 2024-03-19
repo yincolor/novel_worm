@@ -24,7 +24,10 @@ function mainNavActiveItem(id) {
 }
 
 function Main() {
+    const {name, version} = local.getAppData(); 
     window.win_name = "小说蠕虫的主窗口，由TY编写"; 
+    document.getElementById('app-title-txt').innerText = name; 
+    document.title = `${name} v${version}`;  
     
     /** 设置左侧导航栏的点击响应 */
     document.getElementById('main-page').onclick = () => { 
@@ -86,6 +89,8 @@ function Main() {
         console.log("操作滚动到顶部");
         document.getElementById('page-view').scrollTop = 0 ; 
     })
+
+
     console.log('Main', '创建初始页面 - main_page');
     createPage('main-page', '我的书架', MainPage);
     mainNavActiveItem('main-page');

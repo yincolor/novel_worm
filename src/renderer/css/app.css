@@ -1,25 +1,16 @@
-html,
-body {
+html, body {
     height: 100%;
-    /* font-size: 14px; */
 }
-
 .page-tab-btn {
     cursor: pointer;
     min-width: 4em;
 }
-
-a {
-    text-decoration: none;
-}
-
-
+a { text-decoration: none; }
 dialog {
     border: 1px solid rgba(0, 0, 0, 0.3);
     border-radius: 6px;
     box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
 }
-
 dialog::backdrop {
     position: fixed;
     top: 0;
@@ -28,22 +19,16 @@ dialog::backdrop {
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.8);
 }
-
-textarea{
-    resize: both;
-}
-
+textarea{ resize: both; }
 #page-view {
     background-image: url('../img/logo_bg.svg');
     background-repeat: no-repeat;
     background-position: center;
     background-size: 64%;
 }
-
 #page-view * {
     background-image: none;
 }
-
 #iframe-container{
     height: 300px;
     width: 300px;
@@ -54,7 +39,4 @@ textarea{
     position: fixed;
     z-index: -10000;
 }
-
-#main-window-view{
-    background-color: #fff;
-}
+#main-window-view{ background-color: #fff; }

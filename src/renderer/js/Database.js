@@ -134,14 +134,6 @@ export class BookSourceManager {
         return res;
     }
 
-    // static async getEnableBookSource() {
-    //     const res = await this.connection.select({
-    //         from: this.tbl_book_source.name,
-    //         where: { is_use: 1 }
-    //     });
-    //     return res;
-    // }
-
     /**
      * 获取生效的书源对象
      * @returns 
@@ -156,9 +148,6 @@ export class BookSourceManager {
             for (const item of res) {
                 const { name, site_url, script } = item;
                 try {
-                    // const func = new Function('args = arguments[0]; \n' + script);
-                    // const source = func(this.book_source_args);
-
                     source_list.push(this.createBookSourceByScript(script));
                 } catch (error) {
                     alert(`获取生效书源失败，书源：${name} - ${site_url}`);
@@ -177,7 +166,7 @@ export class BookSourceManager {
      * @returns 
      */
     static createBookSourceByScript(source_script) {
-        const func = new Function('args = arguments[0]; \n' + source_script);
+        const func = new Function('let args = arguments[0]; const document = {}; const window = {}; const indexedDB = {}; let localStorage = {}; let location = {}; \n' + source_script);
         const source = func(this.book_source_args);
         return source; 
     }
@@ -210,7 +199,7 @@ export class BookSourceManager {
         });
         if (res && res.length > 0) {
             const source_script = res[0]?.script;
-            const func = new Function('args = arguments[0]; \n' + source_script);
+            const func = new Function('let args = arguments[0]; let document = {}; let window = {}; let indexedDB = {}; let localStorage = {}; let location = {}; \n' + source_script);
             if (func) {
                 return func(this.book_source_args);
             } else {
