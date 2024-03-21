@@ -17,35 +17,54 @@ export class TabbedItem {
         this.create();
     }
     create() {
-        const p1 = document.createElement('div');
-        p1.innerHTML = `
-        <li class="nav-item" href="#" data-bs-toggle="tab" data-bs-target="#${this.pane_id}" role="tab" aria-controls="#${this.pane_id}" aria-selected="false">
-            <button class="small nav-link" id='${this.tab_id}' data-bs-toggle="tab" data-bs-target="#${this.pane_id}" type="button" role="tab" aria-controls="${this.pane_id}" aria-selected="true">
-                ${this.name} 
-                <a href='#' class='tab-close-btn'>
-                    <svg  height="14" width="14">
-                    <line x1="2" y1="2" x2="12" y2="12" style="stroke:#232323;stroke-width:2"/>
-                    <line x1="12" y1="2" x2="2" y2="12" style="stroke:#232323;stroke-width:2"/>
-                    </svg>
-                </a>
-            </button>
-        </li>`;
-        this.tab_el = p1.children[0];
+        const li = document.createElement('li');
+        li.classList.add('nav-item');
+        li.setAttribute('href', '#');
+        li.setAttribute('data-bs-toggle', 'tab');
+        li.setAttribute('data-bs-target', `#${this.pane_id}`);
+        li.setAttribute('role', 'tab');
+        li.setAttribute('aria-controls', `#${this.pane_id}`);
+        li.setAttribute('aria-selected', 'false');
+        const tab_btn = document.createElement('button');
+        tab_btn.classList.add('small', 'nav-link');
+        tab_btn.id = this.tab_id;
+        tab_btn.setAttribute('type', 'button');
+        tab_btn.setAttribute('data-bs-toggle', 'tab');
+        tab_btn.setAttribute('data-bs-target', `#${this.pane_id}`);
+        tab_btn.setAttribute('aria-controls', `${this.pane_id}`);
+        tab_btn.setAttribute('aria-selected', 'true');
+        const close_a = document.createElement('a');
+        close_a.setAttribute('href', '#');
+        close_a.classList.add('tab-close-btn');
+        close_a.innerHTML = `<svg  height="17" width="17">
+                            <line x1="4" y1="4" x2="15" y2="15" style="stroke:#dc3545;stroke-width:1.2"/>
+                            <line x1="15" y1="4" x2="4" y2="15" style="stroke:#dc3545;stroke-width:1.2"/>
+                        </svg>`;
+        const span = document.createElement('span');
+        span.textContent = this.name;
+        // tab_btn.textContent = this.name;
+        tab_btn.append(span, close_a);
+        li.append(tab_btn);
+        this.tab_el = li;  //p1.children[0];
         const p2 = document.createElement('div');
         p2.innerHTML = `<div id="${this.pane_id}" class="tab-pane fade" role="tabpanel" aria-labelledby="${this.tab_id}">这是${this.name}</div>`;
         this.pane_el = p2.children[0];
 
-        this.tab_el.addEventListener('click', (ev) => {
-            if (ev.target.classList.contains('tab-close-btn')) {
-                const closeTabbedEvent = new CustomEvent('tabbed-close', { detail: { id: this.id, tab_id: this.tab_id, pane_id: this.pane_id } });
-                document.dispatchEvent(closeTabbedEvent);
-            } else {
-                console.log('TabbedItem', '点击到标签，展示该标签页：' + this.name);
-                if (this.pane_content) {
-                    this.pane_content.onPageShow();
-                }
+        span.addEventListener('click', (ev) => {
+            // console.log('TabbedItem', '点击：', ev.target);
+            console.log('TabbedItem', '点击到标签，展示该标签页：' + this.name);
+            if (this.pane_content) {
+                this.pane_content.onPageShow();
             }
         });
+        close_a.addEventListener('click', (ev) => {
+            // console.log('TabbedItem', '点击：', ev.target);
+            console.log('TabbedItem', '点击到标签的关闭按钮，关闭该标签页：' + this.name);
+            const closeTabbedEvent = new CustomEvent('tabbed-close', { detail: { id: this.id, tab_id: this.tab_id, pane_id: this.pane_id } });
+            document.dispatchEvent(closeTabbedEvent);
+        });
+
+
     }
     hideTab() {
         this.tab_is_hide = true;
@@ -139,8 +158,8 @@ export class TabbedManager {
         const index = this.tabbed_list.indexOf(tabbed_item);
         console.log('TabbedManager', `删除标签页 ${index} ${id}`);
         this.tabbed_list.splice(index, 1);
-        
-        tabbed_item.pane_content.onClose(); 
+
+        tabbed_item.pane_content.onClose();
         tabbed_item.remove();
         this.update();
     }

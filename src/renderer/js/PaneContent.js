@@ -651,20 +651,25 @@ export class BookSource extends PaneContent {
     }
     async openSourceEditerDialog(site_url) {
         /** 创建编辑结构 */
-        const d = document.createElement('dialog');
-        const t = document.createElement('textarea');
+        const dialog = document.createElement('dialog');
+        const textarea = document.createElement('textarea');
+        const br = document.createElement('br');
+        const br2 = document.createElement('br');
         const ok_btn = document.createElement('button');
         const cancel_btn = document.createElement('button');
-        ok_btn.textContent = '确定';
-        cancel_btn.textContent = '取消';
+        const read_txt_file_btn = document.createElement('button'); 
+        
+        textarea.rows = 8;
+        textarea.cols = 40; 
+        ok_btn.textContent = ' 确定 ';
+        cancel_btn.textContent = ' 取消 ';
+        read_txt_file_btn.textContent = ' 读取文本文件 '; 
 
         ok_btn.onclick = async () => {
             let source_data = null;
-            const text = t.value;
+            const text = textarea.value;
             try {
                 const _s = BookSourceManager.createBookSourceByScript(text);
-                // const func = new Function(text);
-                // const _s = func();
                 console.log('BookSource', '读取代码文本，生成书源：', _s?.name);
                 if (_s?.name && _s?.site) {
                     source_data = { site_url: _s.site, name: _s.name, is_use: 1, script: text }
@@ -680,26 +685,35 @@ export class BookSource extends PaneContent {
             if (source_data && Object.keys(source_data).length > 0) {
                 await BookSourceManager.createSource(source_data);
             }
-            d.close();
+            dialog.close();
         }
 
         cancel_btn.onclick = () => {
-            d.close();
+            dialog.close();
+        }
+        read_txt_file_btn.onclick = async () => {
+            const {is_ok,text} = await local.readTextFile();
+            console.log(is_ok);
+            console.log(text);
+            if(is_ok){
+                console.log('BookSource', '读取到文本：', text);
+                textarea.value = text; 
+            }
         }
 
-        d.append(t, ok_btn, cancel_btn);
+        dialog.append(read_txt_file_btn, br, textarea, br2, ok_btn, cancel_btn);
 
         /* 判断是否为新增书源，如果不是，则将之前的内容 */
         if (site_url && site_url.length && site_url.length > 0) {
             const res = await BookSourceManager.getBookSourceDataBySiteUrl(site_url);
             const context = res[0].script;
-            t.value = context;
+            textarea.value = context;
         }
 
-        document.body.append(d);
-        d.showModal();
-        d.onclose = () => {
-            document.body.removeChild(d);
+        document.body.append(dialog);
+        dialog.showModal();
+        dialog.onclose = () => {
+            document.body.removeChild(dialog);
             this.updateBookSourceTable();
         }
     }

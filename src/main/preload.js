@@ -15,6 +15,11 @@ contextBridge.exposeInMainWorld('local', {
         const { is_ok, file_path } = await ipcRenderer.invoke('save-book', book_name, content);
         return { is_ok, file_path };
     },
+    /** 读取一个文本文件的内容 */
+    readTextFile:async () => {
+        const { is_ok, text } = await ipcRenderer.invoke('read-text-file');
+        return { is_ok, text };
+    },
     /** 获取应用的配置数据 */
-    getAppData: () => { return { name: '窃墨蠕虫', version: '0.4.2' }; }
+    getAppData: () => { return { name: '窃墨蠕虫', version: '0.4.3' }; }
 });

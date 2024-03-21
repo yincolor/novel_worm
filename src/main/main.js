@@ -47,14 +47,14 @@ ipcMain.on('dev-tools', ()=>{ mainWindow?.openDevTools() });
 ipcMain.handle('save-book',async (ev, book_name, save_content) => {
     const os = require('os');
     const path = require('path'); 
-    console.log(`保存书籍《${book_name}》`);
+    // console.log(`保存书籍《${book_name}》`);
     const default_path = os.homedir(); 
     const {canceled, filePath} = await dialog.showSaveDialog(mainWindow, {
         title:'保存书籍', 
         defaultPath: path.join(default_path, `《${book_name}》.txt`), 
         message:"选择保存的文件路径"
     }); 
-    console.log(`选择的保存路径为：${(!canceled)?filePath:'没有选择文件保存路径'}`);
+    // console.log(`选择的保存路径为：${(!canceled)?filePath:'没有选择文件保存路径'}`);
     if(!canceled){
         let is_saved = false;
         try {
@@ -74,4 +74,21 @@ ipcMain.handle('save-book',async (ev, book_name, save_content) => {
     }else {
         return {is_ok: false, file_path: null};
     }    
+});
+ipcMain.handle('read-text-file', async (ev) => {
+    const os = require('os');
+    const fs = require('fs'); 
+    const {canceled, filePaths} = await dialog.showOpenDialog(mainWindow, {
+        title: '选择一个文本文件',
+        defaultPath: os.homedir(),
+        filters: [{name:"文本文件", extensions: ['txt','js']}]
+    });
+    if(canceled || filePaths.length <= 0){ 
+        // console.log('放弃读取', canceled, filePaths);
+        return {is_ok: false, text:''}; 
+    }
+    const str = fs.readFileSync(filePaths[0], {encoding:'utf-8'}); 
+    // console.log('读取到文件：');
+    // console.log(str); 
+    return { is_ok: true, text: str };
 });
