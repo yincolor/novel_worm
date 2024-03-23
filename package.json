@@ -1,12 +1,12 @@
 {
-  "appid":"net.ty.novel_worm",
-  "name": "novel_worm",
+  "appid":"net.yincolor.ty.novelworm",
+  "name": "novelworm",
   "version": "0.4.3",
   "description": "",
   "main": "src/main/main.js",
   "scripts": {
     "test": "electron .",
-    "pack": "electron-packager ./ novel_worm --out ./dist --overwrite --electron-version=25.9.4 --ignore=dist/ --ignore=node_modules/ --extra-resource=res/"
+    "pack": "electron-packager ./ novelworm --out ./dist --overwrite --electron-version=25.9.4 --ignore=dist/ --ignore=node_modules/ --extra-resource=res/"
   },
   "keywords": [ "application" ],
   "author": "ty",
