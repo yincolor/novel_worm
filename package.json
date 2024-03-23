@@ -1,4 +1,5 @@
 {
+  "appid":"net.ty.novel_worm",
   "name": "novel_worm",
   "version": "0.4.3",
   "description": "",
@@ -7,11 +8,9 @@
     "test": "electron .",
     "pack": "electron-packager ./ novel_worm --out ./dist --overwrite --electron-version=25.9.4 --ignore=dist/ --ignore=node_modules/ --extra-resource=res/"
   },
-  "keywords": [
-    "application"
-  ],
+  "keywords": [ "application" ],
   "author": "ty",
-  "license": "ISC",
+  "license": "AGPL-3.0",
   "devDependencies": {
     "@electron/packager": "^18.1.3",
     "electron": "^25.9.4"

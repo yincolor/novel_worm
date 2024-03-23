@@ -87,8 +87,7 @@ export class TabbedItem {
         this.pane_el.appendChild(pane_content.dom);
     }
     remove() {
-        console.log('TabbedItem', '移除标签页：');
-        console.log(this.pane_content);
+        console.log('TabbedItem', '移除标签页：', this.pane_content);
         this.tab_el.remove();
         this.pane_el.remove();
     }
@@ -152,8 +151,7 @@ export class TabbedManager {
         return null;
     }
     removeItemById(id) {
-        console.log('TabbedManager', "当前标签页列表：");
-        console.log(this.tabbed_list);
+        // console.log('TabbedManager', "当前标签页列表：", this.tabbed_list);
         const tabbed_item = this.findItemById(id);
         const index = this.tabbed_list.indexOf(tabbed_item);
         console.log('TabbedManager', `删除标签页 ${index} ${id}`);

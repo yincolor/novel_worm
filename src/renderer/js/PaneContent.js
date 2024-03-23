@@ -54,7 +54,7 @@ export class MainPage extends PaneContent {
     }
     start() {
         this.book_table = new Table({
-            columns: ['名称', '作者', '阅读进度', '书源', '操作'],
+            columns: ['书籍名称', '作者', '阅读进度', '书源', '操作'],
             children: []
         });
         const component = new VBox({
@@ -88,7 +88,7 @@ export class MainPage extends PaneContent {
                 source_cache[site_url] = _book_source; 
             }
             const site_name = _book_source?.name || '丢失的书源';
-            const row = this.createBookTableRow(site_url, book_info_url, name, author, reading_chapter_index, chapter_num, `${site_name}（${site_url}）`);
+            const row = this.createBookTableRow(site_url, book_info_url, name, author, reading_chapter_index, chapter_num, site_name);
             this.book_table.children.push(row);
         }
         this.book_table.update();
@@ -206,9 +206,9 @@ export class SearchList extends PaneContent {
                 console.error(error);
                 break;
             }
-            await this.updateSearchList();
-            console.log('SearchList', '当前搜索结果缓存，缓存长度：' + this.search_table_cache.length);
+            console.log('SearchList', '更新当前搜索结果缓存，缓存长度：' + this.search_table_cache.length);
             console.log(this.search_table_cache);
+            await this.updateSearchList();
         }
         this.search_btn.enable();
     }
@@ -279,7 +279,7 @@ export class BookInfo extends PaneContent {
         this.latest_chapter = new Text({ text: '最新章节待加载...' });
         this.intro = new Text({ text: '介绍待加载...' });
         this.save_or_del_btn = this.createSaveOrDeleteBookFromBookshelfButton();
-        this.open_chapter_list_btn = this.createOpenChapterListButton();
+        this.force_network_update_btn = this.createForceNetworkUpdateButton();
         this.start_read_btn = this.createStartReadButton();
         this.chapter_list_table = new Table({
             columns: ['章节列表', '缓存状态'],
@@ -294,9 +294,10 @@ export class BookInfo extends PaneContent {
                 new HBox({
                     children: [
                         this.save_or_del_btn,
-                        this.open_chapter_list_btn,
+                        this.force_network_update_btn,
                         this.start_read_btn
-                    ]
+                    ],
+                    class_list: ['justify-content-center']
                 }),
                 this.intro,
                 this.chapter_list_table
@@ -325,7 +326,6 @@ export class BookInfo extends PaneContent {
             onclick: async () => {
                 console.log('BookInfo', `将《${this.book_name.text}》放入书架，当前详情页面来源：${this.from_page}`);
                 if (this.info_data) {
-                    console.log(this.info_data);
                     if (this.from_page == 'search') {
                         await this.saveBookInfoToDatabase();
                     } else {
@@ -343,12 +343,12 @@ export class BookInfo extends PaneContent {
         });
     }
     /** 创建“网络更新”按钮 */
-    createOpenChapterListButton() {
+    createForceNetworkUpdateButton() {
         return new Button({
             text: '强制网络更新',
             class_list: ['text-nowrap', 'btn-primary', 'btn-sm'],
             onclick: async () => {
-                console.log('BookInfo', `将《${this.book_name.text}》的信息进行网络更新`)
+                console.log('BookInfo', `将《${this.book_name.text}》的信息进行强制网络更新`)
                 this.updateBookInfo(true);
             }
         });
@@ -366,7 +366,7 @@ export class BookInfo extends PaneContent {
                     const is_save = (this.chapter_list[0]?.is_save == 1) ? 1 : 0;
                     console.log('BookInfo', `打开章节：${_chapter_name} ${_chapter_url} ${is_save == 0 ? '尚未缓存' : '已缓存'}`);
                     let chapter_item = await BookshelfManager.getChapterItemByChapterUrl(_chapter_url);
-                    console.log("BookInfo", '从书架数据库中获得章节对象：', chapter_item);
+                    // console.log("BookInfo", '从书架数据库中获得章节对象：', chapter_item);
                     if (!chapter_item) {
                         console.log('BookInfo', '没有从书架数据库中查到该章节，可能是尚未放入书架;');
                         const is_save_to_bookshelf = confirm('阅读章节内容，需要先将本书放入书架，是否放入书架？');
@@ -577,15 +577,8 @@ export class BookSource extends PaneContent {
         });
         const component = new VBox({
             children: [
-                new HBox({
-                    children: [
-                        this.add_btn
-                    ]
-                }),
-                new VBox({
-                    class_list: ['flex-grow-1'],
-                    children: [this.source_table]
-                })
+                new HBox({ children: [this.add_btn], class_list: ['justify-content-end'] }),
+                new VBox({ children: [this.source_table], class_list: ['flex-grow-1'] })
             ]
         });
         this.dom = component.html();
@@ -678,6 +671,7 @@ export class BookSource extends PaneContent {
                     source_data = null;
                 }
             } catch (error) {
+                console.log('BookSource', '创建书源失败：');
                 console.error(error);
                 source_data = null;
             }
@@ -693,8 +687,6 @@ export class BookSource extends PaneContent {
         }
         read_txt_file_btn.onclick = async () => {
             const {is_ok,text} = await local.readTextFile();
-            console.log(is_ok);
-            console.log(text);
             if(is_ok){
                 console.log('BookSource', '读取到文本：', text);
                 textarea.value = text; 
@@ -739,10 +731,10 @@ export class ChapterContent extends PaneContent {
         this.prev_chapter_foot_btn = this.createPrevChapterButton();
         const component = new VBox({
             children: [
-                new HBox({ children: [this.book_name_dom, this.chapter_name_dom] }),
-                new HBox({ children: [this.prev_chapter_btn, this.next_chapter_btn] }),
+                new HBox({ children: [this.book_name_dom, this.chapter_name_dom], class_list: ['justify-content-center'] }),
+                new HBox({ children: [this.prev_chapter_btn, this.next_chapter_btn], class_list: ['justify-content-around'] }),
                 this.chapter_content_dom,
-                new HBox({ children: [this.prev_chapter_foot_btn, this.next_chapter_foot_btn] })
+                new HBox({ children: [this.prev_chapter_foot_btn, this.next_chapter_foot_btn], class_list: ['justify-content-around'] })
             ]
         });
         this.dom = component.html();
@@ -764,7 +756,6 @@ export class ChapterContent extends PaneContent {
     async updateChapterContent() {
         console.log('ChapterContent', '开始更新书源');
         const source = await this.getBookSource();
-        console.log('ChapterContent', '获得书源：', source);
         const book_info = await BookshelfManager.getBookInfoByInfoUrl(this.book_info_url);
         if (source && book_info) {
             this.disableNextPrevButton();
@@ -772,9 +763,9 @@ export class ChapterContent extends PaneContent {
             const { chapter_url, chapter_name, book_info_url, site_url, c_index, is_save, content } = await BookshelfManager.getChapterItem(this.book_info_url, reading_chapter_index);
             if (is_save != 1) {
                 /* 当前章节尚未保存内容或保存状态异常，则将内容通过网路请求，并存入数据库中 */
-                console.log('ChapterContent', '开始获取章节文本内容');
+                // console.log('ChapterContent', '开始获取章节文本内容');
                 const _chapter_content = await source.chapter_content(chapter_url);
-                console.log('ChapterContent', '成功获得文本，文本长度：', _chapter_content.length);
+                console.log('ChapterContent', '成功获取章节文本，文本长度：', _chapter_content.length);
                 this.chapter_content_dom.dom.innerText = _chapter_content;
                 BookshelfManager.saveChapterContent(chapter_url, _chapter_content);
             } else {
@@ -785,7 +776,9 @@ export class ChapterContent extends PaneContent {
             this.chapter_name_dom.update(chapter_name);
             this.enableNextPrevButton();
         } else {
-            console.error('ChapterContent', '获取书源 或者 书籍信息失败')
+            console.error('ChapterContent', '获取书源 或者 书籍信息失败');
+            console.log('ChapterContent', "souce = ", source);
+            console.log('ChapterContent', "book_info = ", book_info);
         }
     }
 
@@ -916,8 +909,9 @@ export class CacheManager extends PaneContent {
             if (window.downloader_id) {
                 clearInterval(window.downloader_id);
             }
+            console.log('CacheManager', '创建定时执行器'); 
             window.downloader_id = setInterval(async () => {
-                console.log('CacheManager', this.rand_num, '扫描是否有正想要缓存章节的书');
+                console.log('CacheManager', this.rand_num, '扫描是否有正想要缓存章节的书：', JSON.stringify(this.download_data));
                 const book_url_key_list = Object.keys(this.download_data);
                 if (book_url_key_list.length > 0) {
                     let have_update = false;

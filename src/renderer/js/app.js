@@ -52,25 +52,44 @@ function Main() {
     document.getElementById('app-about').onclick = () => { 
         createPage('app-about', '关于本软件', AppAbout); 
     }
+    /** 应用重新启动点击事件 */
     document.getElementById('app-reload').onclick = () => {  
         local.reload(); 
     }
+    /** 应用调试窗口按钮点击事件 */
     document.getElementById('app-dev-tools').onclick = () => { 
         local.devTools(); 
     }
+    /** 应用退出按钮点击事件 */
     document.getElementById('app-quit').onclick = () => { 
         local.quit(); 
     }
+    /** 标签页标签向左滚动按钮点击事件 */
     document.getElementById('tabbar-scroller-left-btn').onclick = () => { 
         tabbedManager.moveTabsShowView('left'); 
     }
+    /** 标签页标签向右滚动按钮点击事件 */
     document.getElementById('tabbar-scroller-right-btn').onclick = () => { 
         tabbedManager.moveTabsShowView('right'); 
+    }
+    /** 隐藏左侧菜单栏按钮点击事件 */
+    document.getElementById('hide-left-view-btn').onclick = (ev) =>{
+        const left_view = document.getElementById('left-view');
+        const hide_btn = document.getElementById('hide-left-view-btn');
+        if(left_view.classList.contains('d-none')){
+            left_view.classList.remove('d-none');
+            hide_btn.textContent = '◀';
+            hide_btn.style.left = '130px';
+        }else {
+            left_view.classList.add('d-none');
+            hide_btn.textContent = '▶';
+            hide_btn.style.left = '2px';
+        }
     }
 
     /*监听新增页面事件*/
     document.addEventListener('add-page', (ev) => {
-        console.log(ev);
+        // console.log(ev);
         const { id, name, content } = ev.detail;
         const param = ev.detail?.param; 
         const is_created = tabbedManager.create(id, name, (new content(id, param)) );
@@ -86,10 +105,9 @@ function Main() {
     });
     /** 监听页面滚动到顶部的事件，操作page-view滚动到顶部 */
     document.addEventListener('view-scroll-top', ( )=>{
-        console.log("操作滚动到顶部");
+        // console.log("操作滚动到顶部");
         document.getElementById('page-view').scrollTop = 0 ; 
-    })
-
+    });
 
     console.log('Main', '创建初始页面 - main_page');
     createPage('main-page', '我的书架', MainPage);

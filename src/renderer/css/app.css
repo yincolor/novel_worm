@@ -41,3 +41,15 @@ textarea{ resize: both; }
     z-index: -10000;
 }
 #main-window-view{ background-color: #fff; }
+
+#left-view{
+    width: 128px;
+}
+
+#hide-left-view-btn{
+    position: absolute;
+    left: 130px;
+    bottom: 50%;
+    cursor: pointer;
+    color: rgba(140, 140, 140, 0.3);
+}
