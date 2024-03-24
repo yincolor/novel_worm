@@ -1,10 +1,11 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 
+/** 设置语言 */
+app.commandLine.appendSwitch('lang', 'zh-CN');
 /** 解锁跨域 */
 app.commandLine.appendSwitch('disable-site-isolation-trials'); 
 /** 禁用菜单 */
 Menu.setApplicationMenu(null); 
-
 
 let mainWindow; /* 主窗口 */
 function createWindow(html_filename) {
@@ -14,7 +15,7 @@ function createWindow(html_filename) {
         height: 600, 
         minWidth: 640,
         minHeight: 360,
-        icon: "res/icon.png",
+        icon: path.join(__dirname, 'res/icon.png'),
         webPreferences: {
             webSecurity:false, /* 禁用同源策略，让窗口也能request小说网站的URL */
             preload: path.join(__dirname, './preload.js') ,
